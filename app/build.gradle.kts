@@ -76,6 +76,10 @@ dependencies {
     implementation(libs.jetbrains.kotlinx.serialization.json) // Use the latest version available
     implementation(libs.kotlin.stdlib)  // Make sure Kotlin is set to a compatible version
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.paging.compose)
+
 }
 
 kapt {

@@ -2,89 +2,163 @@ package com.example.imagetagger.composables
 
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.content.ContentUris
-import android.provider.MediaStore.Images
 import android.support.annotation.RequiresPermission
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
-import android.content.ContentResolver
-import android.os.Build
-import android.provider.MediaStore
-import android.text.format.Formatter
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.Text
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
+import com.example.imagetagger.models.FileEntry
+import com.example.imagetagger.models.ViewModel
 
 @RequiresPermission(anyOf = [READ_MEDIA_IMAGES, READ_EXTERNAL_STORAGE])
 @Composable
 fun MediaStoreQueryContent() {
-    val context = LocalContext.current
-    val files by loadImages(context.contentResolver)
+//    val context = LocalContext.current
+    val viewModel: ViewModel = hiltViewModel()
 
-    LazyColumn(Modifier.fillMaxSize()) {
-        item {
-            ListItem(
-                headlineContent = {
-                    if (files.isNotEmpty()) {
-                        Text("${files.size} images found")
-                    }
-                },
-            )
-            HorizontalDivider()
-        }
+    val loadedFiles = remember { mutableStateListOf<FileEntry>() }
+    val files by viewModel.photoQuery.collectAsState()
+    val lazyGridState = rememberLazyStaggeredGridState()
 
-        items(files) { file ->
-            ListItem(
-                leadingContent = {
-                    AsyncImage(
-                        model = file.uri,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(64.dp)
-                            .aspectRatio(1f),
-                    )
-                },
-                headlineContent = {
-                    Text(file.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                },
-                supportingContent = { Text(file.mimeType) },
-                trailingContent = { Text(Formatter.formatShortFileSize(context, file.size)) },
-            )
-            HorizontalDivider()
+//    LaunchedEffect(Unit) {
+//        viewModel.fetchAllPhotos(contentResolver = context.contentResolver)
+//    }
+
+    LaunchedEffect(files) {
+//        loadedFiles.clear()
+//        viewModel.newQuery()
+    }
+
+//    val canLoadMore = remember { derivedStateOf { lazyGridState.firstVisibleItemIndex >= loadedFiles.size - 100 } }
+//
+//    if (canLoadMore.value && files.isNotEmpty()) {
+//        Log.i("Photos", "LoadedValue ${lazyGridState.firstVisibleItemIndex} and ${loadedFiles.size - 100}")
+//        val startIndex = loadedFiles.size
+//        val endIndex = (startIndex + 100).coerceAtMost(files.size)
+//        val newItems = files.subList(startIndex, endIndex)
+//        loadedFiles.addAll(newItems)
+//    }
+//
+//    LazyVerticalStaggeredGrid(
+//        state = lazyGridState,
+//        columns = StaggeredGridCells.Adaptive(200.dp),
+//        verticalItemSpacing = 4.dp,
+//        horizontalArrangement = Arrangement.spacedBy(4.dp),
+//        content = {
+//            items(loadedFiles) { photo ->
+//
+//                AsyncImage(
+//                    model = photo.uri,
+//                    contentDescription = null,
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .wrapContentHeight()
+//                        .clickable { Log.d("Hi", "HELLO!") },
+//                )
+//            }
+//        },
+//        modifier = Modifier.fillMaxSize()
+//    )
+
+    PhotoGrid(modifier = Modifier)
+
+}
+
+
+@Composable
+fun CenteredLoadingSpinner() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(64.dp), // Spinner size
+            color = MaterialTheme.colorScheme.primary, // Spinner color
+            strokeWidth = 4.dp // Thickness of the spinner
+        )
+    }
+}
+
+@Composable
+fun PhotoGrid(
+    modifier: Modifier
+) {
+    val viewModel: ViewModel = hiltViewModel()
+    val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
+    Log.i("Grid", "Loading Grid")
+
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Adaptive(200.dp),
+        verticalItemSpacing = 4.dp,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        items(
+            lazyPagingItems.itemCount,
+            key = lazyPagingItems.itemKey { it.dateAdded }
+        )
+        { index ->
+            val file = lazyPagingItems[index]
+            if (file != null) {
+                AsyncImage(
+                    model = file.uri,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clickable {
+                            Log.d("Hi", "HELLO!")
+                        }
+                )
+            } else {
+                Loading(modifier)
+            }
         }
     }
 }
 
 @Composable
-private fun loadImages(
-    contentResolver: ContentResolver,
-): State<List<FileEntry>> = produceState(initialValue = emptyList()) {
-    value = getImages(contentResolver)
+fun Loading(modifier: Modifier) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+    ) {
+        CircularProgressIndicator()
+    }
 }
-
-data class FileEntry(
-    val uri: Uri,
-    val name: String,
-    val size: Long,
-    val mimeType: String,
-    val dateAdded: Long,
-)
-

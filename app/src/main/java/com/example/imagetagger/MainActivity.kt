@@ -25,6 +25,7 @@ import com.example.imagetagger.models.ViewModel
 import com.example.imagetagger.composables.*
 import com.example.imagetagger.ui.theme.ImageTaggerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
 
@@ -69,6 +70,7 @@ object PhotoScreen
 @Composable
 fun MainEntry(viewModel: ViewModel = hiltViewModel()) {
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     val backHandler: (destination: Any) -> Unit = { destination ->
         when (destination) {
@@ -79,11 +81,14 @@ fun MainEntry(viewModel: ViewModel = hiltViewModel()) {
             }
         }
     }
+
     NavHost(navController, startDestination = StartScreen) {
         composable<StartScreen> {
             StartScreen(
                 modifier = Modifier,
-                onEnterPressed = { backHandler(PhotoScreen) }
+                onEnterPressed = {
+                    backHandler(PhotoScreen)
+                }
             )
         }
         composable<PhotoScreen> {
