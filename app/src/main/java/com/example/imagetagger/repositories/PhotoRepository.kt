@@ -23,7 +23,6 @@ class PhotoRepository @Inject constructor(
      * used to access the users media gallery
      */
     private val contentResolver: ContentResolver = appContext.contentResolver
-//    private val loadedImages = getImages()
 
     /**
      * gets a single page of all user images

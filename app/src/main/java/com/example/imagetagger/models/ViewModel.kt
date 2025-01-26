@@ -28,6 +28,7 @@ class ViewModel @Inject constructor(
 
     private val _files = MutableStateFlow<List<FileEntry>>(emptyList())
     val photoQuery: StateFlow<List<FileEntry>> = _files.asStateFlow()
+    val tags: MutableList<String> = mutableListOf()
 
 
     private var pagingSource = PhotosPagingSource(photoRepository)
@@ -36,17 +37,25 @@ class ViewModel @Inject constructor(
     }.flow.cachedIn(viewModelScope)
 
 
-//    fun fetchAllPhotos() {
-//        viewModelScope.launch {
-//            val files = photoRepository.getImages()
-//            _files.value = files
-//            pagingSource.invalidate()
-//            Log.i("VM", "Got photos and invalidated pager")
-//        }
-//    }
+    fun fetchAllPhotos() {
+        viewModelScope.launch {
+            val files = photoRepository.getImages(1, 2)
+            _files.value = files
+            pagingSource.invalidate()
+            Log.i("VM", "Got photos and invalidated pager")
+        }
+    }
 
     fun newQuery() {
         pagingSource.invalidate()
+    }
+
+    fun allTags() : List<String> {
+        return listOf()
+    }
+
+    fun submitTag(tag: String) {
+        tags.add(tag)
     }
 
 
