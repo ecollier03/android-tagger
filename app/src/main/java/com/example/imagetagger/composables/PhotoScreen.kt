@@ -33,12 +33,14 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
+import com.example.imagetagger.R
 import com.example.imagetagger.models.FileEntry
 import com.example.imagetagger.models.ViewModel
 
@@ -51,47 +53,6 @@ fun MediaStoreQueryContent() {
     val loadedFiles = remember { mutableStateListOf<FileEntry>() }
     val files by viewModel.photoQuery.collectAsState()
     val lazyGridState = rememberLazyStaggeredGridState()
-
-//    LaunchedEffect(Unit) {
-//        viewModel.fetchAllPhotos(contentResolver = context.contentResolver)
-//    }
-
-    LaunchedEffect(files) {
-//        loadedFiles.clear()
-//        viewModel.newQuery()
-    }
-
-//    val canLoadMore = remember { derivedStateOf { lazyGridState.firstVisibleItemIndex >= loadedFiles.size - 100 } }
-//
-//    if (canLoadMore.value && files.isNotEmpty()) {
-//        Log.i("Photos", "LoadedValue ${lazyGridState.firstVisibleItemIndex} and ${loadedFiles.size - 100}")
-//        val startIndex = loadedFiles.size
-//        val endIndex = (startIndex + 100).coerceAtMost(files.size)
-//        val newItems = files.subList(startIndex, endIndex)
-//        loadedFiles.addAll(newItems)
-//    }
-//
-//    LazyVerticalStaggeredGrid(
-//        state = lazyGridState,
-//        columns = StaggeredGridCells.Adaptive(200.dp),
-//        verticalItemSpacing = 4.dp,
-//        horizontalArrangement = Arrangement.spacedBy(4.dp),
-//        content = {
-//            items(loadedFiles) { photo ->
-//
-//                AsyncImage(
-//                    model = photo.uri,
-//                    contentDescription = null,
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                        .clickable { Log.d("Hi", "HELLO!") },
-//                )
-//            }
-//        },
-//        modifier = Modifier.fillMaxSize()
-//    )
 
     PhotoGrid(modifier = Modifier)
 
@@ -129,7 +90,7 @@ fun PhotoGrid(
     ) {
         items(
             lazyPagingItems.itemCount,
-            key = lazyPagingItems.itemKey { it.dateAdded }
+            key = lazyPagingItems.itemKey { it.uri }
         )
         { index ->
             val file = lazyPagingItems[index]
@@ -138,6 +99,7 @@ fun PhotoGrid(
                     model = file.uri,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.placeholder_gray),
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
