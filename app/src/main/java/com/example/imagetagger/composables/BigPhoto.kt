@@ -1,62 +1,45 @@
 package com.example.imagetagger.composables
 
-import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
+//import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import com.example.imagetagger.BigPhoto
 import com.example.imagetagger.R
 import com.example.imagetagger.models.ViewModel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerSnapDistance
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 
 @Composable
 fun BigPhoto(
     initialIndex: Int,
+    onIndexChange: (Int) -> Unit,
     modifier: Modifier
 ){
     val viewModel: ViewModel = hiltViewModel()
-    val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
+    val lazyPagingItems = viewModel.scrollPagingData.collectAsLazyPagingItems()
 
+    Log.i("BigPhoto","data is ${lazyPagingItems.itemCount}")
+    val pagerState = rememberPagerState(initialPage = initialIndex) { lazyPagingItems.itemCount }
 
-    // State for the HorizontalPager
-    val pagerState = rememberPagerState(pageCount = { lazyPagingItems.itemCount }, initialPage = initialIndex)
-    val coroutineScope = rememberCoroutineScope()
-    Log.i("page", "pager state ${pagerState.currentPage} and initial index $initialIndex")
-
-    LaunchedEffect(pagerState, initialIndex) {
-        pagerState.scrollToPage(5)
-    }
-
+    onIndexChange(pagerState.currentPage)
 
     HorizontalPager(
         state = pagerState,

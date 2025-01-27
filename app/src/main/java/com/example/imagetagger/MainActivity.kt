@@ -83,9 +83,8 @@ object BigPhoto
 
 @SuppressLint("MissingPermission")
 @Composable
-fun MainEntry(viewModel: ViewModel = hiltViewModel()) {
+fun MainEntry() {
     val navController = rememberNavController()
-    val context = LocalContext.current
     var currentImageIndex by remember { mutableIntStateOf(0) }
 
     val backHandler: (destination: Any) -> Unit = { destination ->
@@ -124,7 +123,10 @@ fun MainEntry(viewModel: ViewModel = hiltViewModel()) {
         composable<BigPhoto> {
             BigPhoto(
                 initialIndex = currentImageIndex,
-                modifier = Modifier
+                onIndexChange = {
+                    currentImageIndex = it
+                },
+                modifier = Modifier,
             )
         }
     }

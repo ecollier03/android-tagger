@@ -2,7 +2,6 @@ package com.example.imagetagger.composables
 
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.net.Uri
 import android.support.annotation.RequiresPermission
 import android.util.Log
 import androidx.compose.foundation.background
@@ -22,12 +21,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -65,13 +67,11 @@ fun PhotoGrid(
     onPhotoClick: (Int) -> Unit
 ) {
     val viewModel: ViewModel = hiltViewModel()
-    val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
-    Log.i("Grid", "Loading Grid with ${lazyPagingItems.itemCount}")
+    val lazyPagingItems = viewModel.scrollPagingData.collectAsLazyPagingItems()
+    val listState = rememberLazyListState()
+
 
     LazyColumn(
-//        columns = GridCells.Adaptive(200.dp),
-//        verticalItemSpacing = 4.dp,
-//        horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         items(
