@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.paging.compose)
+    implementation(libs.androidx.room.ktx)
 
 }
 

@@ -1,11 +1,6 @@
 package com.example.imagetagger.models
 
-import android.app.Application
-import android.content.ContentResolver
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -13,8 +8,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.example.imagetagger.repositories.PhotoRepository
 import com.example.imagetagger.repositories.PhotosPagingSource
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,8 +23,15 @@ class ViewModel @Inject constructor(
 
     private val _files = MutableStateFlow<List<FileEntry>>(emptyList())
     val photoQuery: StateFlow<List<FileEntry>> = _files.asStateFlow()
-    val tags: MutableList<String> = mutableListOf()
+    val allTags =  MutableStateFlow<List<String>>(emptyList())
 
+    init {
+        viewModelScope.launch {
+            photoRepository.allTags().collect {
+                allTags.value = it
+            }
+        }
+    }
 
     private var pagingSource = PhotosPagingSource(photoRepository)
     var pagingData = Pager(PagingConfig(pageSize = 20)) {
@@ -46,17 +48,9 @@ class ViewModel @Inject constructor(
         }
     }
 
-    fun newQuery() {
-        pagingSource.invalidate()
-    }
-
-    fun allTags() : List<String> {
-        return listOf()
-    }
-
     fun submitTag(tag: String) {
-        tags.add(tag)
+        viewModelScope.launch {
+            photoRepository.addTag(tag)
+        }
     }
-
-
 }

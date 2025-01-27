@@ -10,14 +10,22 @@ import android.util.Log
 import com.example.imagetagger.models.FileEntry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PhotoRepository @Inject constructor(
+    private val database: PhotoDatabase,
     @ApplicationContext appContext: Context
 ) {
+
+    private val UriDAO = database.UrisDAO()
+    private val TagsDAO = database.TagsDAO()
+    private val TaggedDAO = database.TaggedDAO()
+
 
     /**
      * used to access the users media gallery
@@ -77,6 +85,23 @@ class PhotoRepository @Inject constructor(
             }
             return@withContext images
         }
+    }
+
+    /**
+     * get all user generated tags
+     */
+    fun allTags() : Flow<List<String>> {
+        Log.d("Repo", "Getting Tags")
+        return TagsDAO.getAllTags().map {
+            it.map { entity ->
+                entity.tag
+            }
+        }
+    }
+
+    suspend fun addTag(tag: String) {
+        val data = TagsEntity(tag = tag)
+        TagsDAO.insert(data)
     }
 
 }

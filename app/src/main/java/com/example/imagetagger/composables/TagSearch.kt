@@ -26,6 +26,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.imagetagger.models.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 
@@ -87,6 +90,10 @@ fun LongBasicDropdownMenu(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val viewModel: ViewModel = hiltViewModel()
+    val tags by viewModel.allTags.collectAsState()
+    LaunchedEffect(tags) {
+        Log.i("Tags", "tags have been updated?")
+    }
 
     Box(
         modifier = Modifier
@@ -104,20 +111,16 @@ fun LongBasicDropdownMenu(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .padding(20.dp)
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier = Modifier.fillMaxWidth()
     ) {
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            viewModel.tags.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = { onClick(option) }
-                )
-            }
+        tags.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(option) },
+                onClick = { onClick(option) }
+            )
         }
     }
 }
