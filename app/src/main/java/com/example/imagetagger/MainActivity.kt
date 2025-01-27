@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 
 
 @AndroidEntryPoint
@@ -85,7 +86,7 @@ object BigPhoto
 fun MainEntry(viewModel: ViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val context = LocalContext.current
-    var currentImageUri by remember { mutableStateOf<Uri?>(null) }
+    var currentImageIndex by remember { mutableIntStateOf(0) }
 
     val backHandler: (destination: Any) -> Unit = { destination ->
         when (destination) {
@@ -114,15 +115,15 @@ fun MainEntry(viewModel: ViewModel = hiltViewModel()) {
         composable<PhotoScreen> {
             MainPhotoScreen(
                 onPhotoClick = {
-                    Log.i("MainActivity", "clicked image with uri $it")
-                    currentImageUri = it
+                    Log.i("MainActivity", "clicked image with index $it")
+                    currentImageIndex = it
                     backHandler(BigPhoto)
                 }
             )
         }
         composable<BigPhoto> {
             BigPhoto(
-                uri = currentImageUri,
+                initialIndex = currentImageIndex,
                 modifier = Modifier
             )
         }

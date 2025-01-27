@@ -38,7 +38,7 @@ import com.example.imagetagger.models.ViewModel
 @RequiresPermission(anyOf = [READ_MEDIA_IMAGES, READ_EXTERNAL_STORAGE])
 @Composable
 fun MainPhotoScreen(
-    onPhotoClick: (Uri) -> Unit,
+    onPhotoClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = Modifier
@@ -62,11 +62,11 @@ fun MainPhotoScreen(
 @Composable
 fun PhotoGrid(
     modifier: Modifier,
-    onPhotoClick: (Uri) -> Unit
+    onPhotoClick: (Int) -> Unit
 ) {
     val viewModel: ViewModel = hiltViewModel()
     val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
-    Log.i("Grid", "Loading Grid")
+    Log.i("Grid", "Loading Grid with ${lazyPagingItems.itemCount}")
 
     LazyColumn(
 //        columns = GridCells.Adaptive(200.dp),
@@ -90,7 +90,7 @@ fun PhotoGrid(
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .clickable {
-                            onPhotoClick(file.uri)
+                            onPhotoClick(index)
                         }
                 )
             } else {

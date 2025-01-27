@@ -15,7 +15,7 @@ class PhotosPagingSource(
 ) : PagingSource<Int, FileEntry>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FileEntry> {
-        Log.d("Pager", "Pager trying to load next page")
+        Log.d("Pager", "Pager trying to load page ${params.key}")
 
         return try {
             val page = params.key ?: 0 // Start at page 0
@@ -35,6 +35,9 @@ class PhotosPagingSource(
     }
 
     override fun getRefreshKey(state: PagingState<Int, FileEntry>): Int? {
-        return state.anchorPosition
+        return state.anchorPosition?.let { anchorPosition ->
+            Log.i("Anchor", "anchor position is $anchorPosition")
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1) ?: 0
+        }
     }
 }
