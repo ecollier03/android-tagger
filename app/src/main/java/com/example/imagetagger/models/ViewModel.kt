@@ -33,18 +33,11 @@ class ViewModel @Inject constructor(
         }
     }
 
-    private var pagingSource = PhotosPagingSource(photoRepository)
-    var pagingData = Pager(PagingConfig(pageSize = 20)) {
-        pagingSource
-    }.flow.cachedIn(viewModelScope)
-
 
     fun fetchAllPhotos() {
         viewModelScope.launch {
-            val files = photoRepository.getImages(1, 2)
+            val files = photoRepository.getImages()
             _files.value = files
-            pagingSource.invalidate()
-            Log.i("VM", "Got photos and invalidated pager")
         }
     }
 

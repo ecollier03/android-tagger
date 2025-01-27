@@ -44,40 +44,40 @@ fun BigPhoto(
     initialIndex: Int,
     modifier: Modifier
 ){
-    val viewModel: ViewModel = hiltViewModel()
-    val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
-
-
-    // State for the HorizontalPager
-    val pagerState = rememberPagerState(pageCount = { lazyPagingItems.itemCount }, initialPage = initialIndex)
-    val coroutineScope = rememberCoroutineScope()
-    Log.i("page", "pager state ${pagerState.currentPage} and initial index $initialIndex")
-
-    LaunchedEffect(pagerState, initialIndex) {
-        pagerState.scrollToPage(5)
-    }
-
-
-    HorizontalPager(
-        state = pagerState,
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) { pageIndex ->
-        val file = lazyPagingItems[pageIndex]
-        if (file != null) {
-            AsyncImage(
-                model = file.uri,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(R.drawable.placeholder_gray),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            )
-        } else {
-            Loading(modifier)
-        }
-    }
+//    val viewModel: ViewModel = hiltViewModel()
+//    val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
+//
+//
+//    // State for the HorizontalPager
+//    val pagerState = rememberPagerState(pageCount = { lazyPagingItems.itemCount }, initialPage = initialIndex)
+//    val coroutineScope = rememberCoroutineScope()
+//    Log.i("page", "pager state ${pagerState.currentPage} and initial index $initialIndex")
+//
+//    LaunchedEffect(pagerState, initialIndex) {
+//        pagerState.scrollToPage(5)
+//    }
+//
+//
+//    HorizontalPager(
+//        state = pagerState,
+//        modifier = modifier
+//            .fillMaxSize()
+//            .background(MaterialTheme.colorScheme.background)
+//    ) { pageIndex ->
+//        val file = lazyPagingItems[pageIndex]
+//        if (file != null) {
+//            AsyncImage(
+//                model = file.uri,
+//                contentDescription = null,
+//                contentScale = ContentScale.Crop,
+//                placeholder = painterResource(R.drawable.placeholder_gray),
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(16.dp)
+//            )
+//        } else {
+//            Loading(modifier)
+//        }
+//    }
 
 }
