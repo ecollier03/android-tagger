@@ -71,13 +71,13 @@ fun MainPhotoScreen(
                     AsyncImage(
                         model = it.uri,
                         contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.Fit,
                         placeholder = painterResource(R.drawable.placeholder_gray),
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
                             .clickable {
-                                onPhotoClick(0)
+                                onPhotoClick(10)
                             }
                     )
                 }
@@ -86,56 +86,3 @@ fun MainPhotoScreen(
         }
     }
 }
-
-
-//@Composable
-//fun PhotoGrid(
-//    modifier: Modifier,
-//    onPhotoClick: (Int) -> Unit
-//) {
-//    val viewModel: ViewModel = hiltViewModel()
-//    val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
-//    Log.i("Grid", "Loading Grid with ${lazyPagingItems.itemCount}")
-//
-//    LazyColumn(
-////        columns = GridCells.Adaptive(200.dp),
-////        verticalItemSpacing = 4.dp,
-////        horizontalArrangement = Arrangement.spacedBy(4.dp),
-//        verticalArrangement = Arrangement.spacedBy(4.dp),
-//    ) {
-//        items(
-//            lazyPagingItems.itemCount,
-//            key = lazyPagingItems.itemKey { it.uri }
-//        )
-//        { index ->
-//            val file = lazyPagingItems[index]
-//            if (file != null) {
-//                AsyncImage(
-//                    model = file.uri,
-//                    contentDescription = null,
-//                    contentScale = ContentScale.Crop,
-//                    placeholder = painterResource(R.drawable.placeholder_gray),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                        .clickable {
-//                            onPhotoClick(index)
-//                        }
-//                )
-//            } else {
-//                Loading(modifier)
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun Loading(modifier: Modifier) {
-//    Box(
-//        Modifier
-//            .fillMaxWidth()
-//            .height(48.dp)
-//    ) {
-//        CircularProgressIndicator()
-//    }
-//}
