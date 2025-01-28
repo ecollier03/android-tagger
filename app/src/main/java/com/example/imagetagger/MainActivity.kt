@@ -1,17 +1,13 @@
 package com.example.imagetagger
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -25,8 +21,6 @@ import com.example.imagetagger.models.ViewModel
 import com.example.imagetagger.composables.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -83,8 +77,9 @@ object BigPhoto
 
 @SuppressLint("MissingPermission")
 @Composable
-fun MainEntry() {
+fun MainEntry(viewModel: ViewModel = hiltViewModel()) {
     val navController = rememberNavController()
+    val context = LocalContext.current
     var currentImageIndex by remember { mutableIntStateOf(0) }
 
     val backHandler: (destination: Any) -> Unit = { destination ->
@@ -113,20 +108,20 @@ fun MainEntry() {
         }
         composable<PhotoScreen> {
             MainPhotoScreen(
+                index = currentImageIndex,
                 onPhotoClick = {
-                    Log.i("MainActivity", "clicked image with index $it")
                     currentImageIndex = it
                     backHandler(BigPhoto)
                 }
             )
         }
         composable<BigPhoto> {
-            BigPhoto(
+            ImageCarousel(
                 initialIndex = currentImageIndex,
-                onIndexChange = {
+                onPageChange = {
                     currentImageIndex = it
                 },
-                modifier = Modifier,
+                modifier = Modifier
             )
         }
     }

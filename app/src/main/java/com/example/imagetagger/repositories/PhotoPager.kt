@@ -19,7 +19,7 @@ class PhotosPagingSource(
         return try {
             val page = params.key ?: 0 // Start at page 0
             val pageSize = params.loadSize // Use the requested load size
-            val response = repository.getImages(params.loadSize, page * pageSize)
+            val response = repository.getImages()
             val nextKey = if (response.size < pageSize) null else page + 1
             val prevKey = if (page == 0) null else page - 1
             Log.d("Pager", "Pager got ${response.size} items back from the repo")

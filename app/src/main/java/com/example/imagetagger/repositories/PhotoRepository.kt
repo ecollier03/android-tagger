@@ -36,8 +36,7 @@ class PhotoRepository @Inject constructor(
      * gets a single page of all user images
      */
     suspend fun getImages(
-        pageSize: Int,
-        offset: Int
+
     ): List<FileEntry> {
         return withContext(Dispatchers.IO) {
             val projection = arrayOf(
@@ -63,16 +62,13 @@ class PhotoRepository @Inject constructor(
                 null, // Filtering values (in this case none)
                 "${Images.Media.DATE_ADDED} DESC", // Sorting order (recent -> older files)
             )?.use { cursor ->
-                if ( !cursor.moveToPosition(offset) ) {
-                    return@withContext images
-                }
                 val idColumn = cursor.getColumnIndexOrThrow(Images.Media._ID)
                 val displayNameColumn = cursor.getColumnIndexOrThrow(Images.Media.DISPLAY_NAME)
                 val sizeColumn = cursor.getColumnIndexOrThrow(Images.Media.SIZE)
                 val mimeTypeColumn = cursor.getColumnIndexOrThrow(Images.Media.MIME_TYPE)
                 val dateAddedColumn = cursor.getColumnIndexOrThrow(Images.Media.DATE_ADDED)
                 var count = 0
-                while (cursor.moveToNext() && count < pageSize) {
+                while (cursor.moveToNext()) {
                     val uri = ContentUris.withAppendedId(collectionUri, cursor.getLong(idColumn))
                     val name = cursor.getString(displayNameColumn)
                     val size = cursor.getLong(sizeColumn)
