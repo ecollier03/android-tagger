@@ -56,6 +56,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ImageCarousel(
     initialIndex: Int,
+    onPageChange: (Int) -> Unit,
     modifier: Modifier
 ){
     val viewModel: ViewModel = hiltViewModel()
@@ -66,8 +67,12 @@ fun ImageCarousel(
         viewModel.fetchAllPhotos()
     }
 
-
-    Log.i("Page", "Page is ${pagerState.pageCount}")
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }
+            .collect {
+                onPageChange(it)
+            }
+    }
 
     HorizontalPager(
         state = pagerState,

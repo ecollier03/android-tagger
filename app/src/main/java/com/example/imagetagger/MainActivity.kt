@@ -108,8 +108,8 @@ fun MainEntry(viewModel: ViewModel = hiltViewModel()) {
         }
         composable<PhotoScreen> {
             MainPhotoScreen(
+                index = currentImageIndex,
                 onPhotoClick = {
-                    Log.i("MainActivity", "clicked image with index $it")
                     currentImageIndex = it
                     backHandler(BigPhoto)
                 }
@@ -118,6 +118,9 @@ fun MainEntry(viewModel: ViewModel = hiltViewModel()) {
         composable<BigPhoto> {
             ImageCarousel(
                 initialIndex = currentImageIndex,
+                onPageChange = {
+                    currentImageIndex = it
+                },
                 modifier = Modifier
             )
         }

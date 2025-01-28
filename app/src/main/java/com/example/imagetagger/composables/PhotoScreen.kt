@@ -12,6 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,9 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
@@ -43,15 +47,20 @@ import com.example.imagetagger.models.ViewModel
 @Composable
 fun MainPhotoScreen(
     onPhotoClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    index: Int,
 ) {
     val viewModel: ViewModel = hiltViewModel()
     val photos = viewModel.photoQuery.collectAsState()
+    val state = rememberLazyStaggeredGridState(index)
 
     Log.i("Photos", "There are ${photos.value.size} photos")
 
     LaunchedEffect(photos) {
         viewModel.fetchAllPhotos()
+    }
+
+    LaunchedEffect(state) {
+        state.scrollToItem(index)
     }
 
     Column(
@@ -63,13 +72,14 @@ fun MainPhotoScreen(
         TagHeader()
         Box(modifier = Modifier.padding(20.dp)) {
             LazyVerticalStaggeredGrid(
+                state = state,
                 columns = StaggeredGridCells.Adaptive(200.dp),
                 verticalItemSpacing = 4.dp,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(photos.value) {
+                itemsIndexed(photos.value)  { index, item ->
                     AsyncImage(
-                        model = it.uri,
+                        model = item.uri,
                         contentDescription = null,
                         contentScale = ContentScale.Fit,
                         placeholder = painterResource(R.drawable.placeholder_gray),
@@ -77,7 +87,8 @@ fun MainPhotoScreen(
                             .fillMaxWidth()
                             .wrapContentHeight()
                             .clickable {
-                                onPhotoClick(10)
+                                Log.d("ViewList", "Clicked photo $index")
+                                onPhotoClick(index)
                             }
                     )
                 }
